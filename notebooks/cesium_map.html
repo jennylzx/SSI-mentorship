@@ -24,16 +24,38 @@
 <body>
     <div id="cesiumContainer"></div>
     <script>
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzNDI2MWI0My0xNWYwLTRmZTYtODBkMC1mZWVhMTBiMGI1NGMiLCJpZCI6MTQ4NTI4LCJpYXQiOjE2ODc0NDA2NzN9.QqSZwaXC8xUqNxnfqmHMqfOtVS_huDYG90mqsjz9In8'; 
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzNDI2MWI0My0xNWYwLTRmZTYtODBkMC1mZWVhMTBiMGI1NGMiLCJpZCI6MTQ4NTI4LCJpYXQiOjE2ODc0NDA2NzN9.QqSZwaXC8xUqNxnfqmHMqfOtVS_huDYG90mqsjz9In8';
 
         var viewer = new Cesium.Viewer('cesiumContainer');
 
         // Load GeoJSON
-        viewer.dataSources.add(Cesium.GeoJsonDataSource.load('dataframe.geojson', {
-            stroke: Cesium.Color.HOTPINK,
-            fill: Cesium.Color.PINK.withAlpha(0.5),
-            strokeWidth: 3
-        }));
+        var dataSource = new Cesium.GeoJsonDataSource();
+        viewer.dataSources.add(dataSource);
+        dataSource.load('dataframe.geojson').then(function () {
+            var entities = dataSource.entities.values;
+
+            for (var i = 0; i < entities.length; i++) {
+                var entity = entities[i];
+                var frequency = entity.properties.frequency.getValue(); // Assuming your GeoJSON has frequency as a property
+
+                // Now set the color based on frequency
+                var color;
+                if (frequency > 400) {
+                    color = Cesium.Color.RED;
+                } else if (frequency > 40) {
+                    color = Cesium.Color.DARKORANGE;
+                } else if (frequency > 15) {
+                    color = Cesium.Color.GOLD;
+                } else if (frequency > 0) {
+                    color = Cesium.Color.SEAGREEN;
+                } else {
+                    color = Cesium.Color.SKYBLUE;
+                }
+
+                // Assign the color to the entity's billboard
+                entity.billboard.color = color;
+            }
+        });
     </script>
 </body>
 </html>
